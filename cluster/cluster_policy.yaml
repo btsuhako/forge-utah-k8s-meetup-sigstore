@@ -1,0 +1,29 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: check-image
+spec:
+  background: false
+  failurePolicy: Fail
+  validationFailureAction: Enforce
+  webhookTimeoutSeconds: 30
+  rules:
+    - name: check-image
+      match:
+        any:
+        - resources:
+            kinds:
+              - Pod
+      verifyImages:
+      - imageReferences:
+        - "ttl.sh/*"
+        attestors:
+        - count: 1
+          entries:
+          - keys:
+              # copy this from cosign.pub
+              publicKeys: |-
+                -----BEGIN PUBLIC KEY-----
+                MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE7atKJfX3YDdM4FG9yfX8hMqiFOhU
+                LdNvE4dPLg2quMnkgdSxDjPXkBZZIP18rjv3Wb2h5FLImbX5PWzhr82xLw==
+                -----END PUBLIC KEY-----
